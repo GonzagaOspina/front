@@ -1,72 +1,209 @@
-<div class="container py-5">
-  <!-- Caja blanca tipo KAYAK -->
-  <div class="bg-white rounded-4 shadow-sm p-4 mb-5">
-    <h3 class="fw-bold mb-3 text-dark">
-      Renta de autos en <span class="text-primary">Colombia</span> 🚗
-    </h3>
+<section class="home-hero py-5">
+  <div class="container">
+    <div class="row align-items-center gy-4">
+      <div class="col-lg-6">
+        <span class="badge bg-light text-primary mb-3">
+          Plataforma de car sharing
+        </span>
+        <h1 class="display-5 fw-bold text-dark mb-3">
+          Encuentra el vehículo ideal para tu próximo viaje
+        </h1>
+        <p class="text-muted mb-4">
+          Busca por ciudad, tipo de vehículo y fechas disponibles. Reserva en línea
+          y recibe confirmación inmediata.
+        </p>
 
-    <!-- Filtros de búsqueda -->
-    <form class="row g-3 align-items-end" (ngSubmit)="buscar()">
-      <div class="col-md-4">
-        <label class="form-label">Ciudad</label>
-        <div class="input-group">
-          <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
-          <input
-            type="text"
-            class="form-control"
-            [(ngModel)]="filtros.ciudad"
-            name="ciudad"
-            placeholder="Ej: Bogotá"
-          />
-        </div>
-      </div>
-
-
-      <div class="col-md-3">
-        <label class="form-label">Fecha inicio</label>
-        <input
-          type="date"
-          class="form-control"
-          [(ngModel)]="filtros.fechaInicio"
-          name="fechaInicio"
-        />
-      </div>
-
-      <div class="col-md-2 d-grid">
-        <button type="submit" class="btn btn-danger">
-          <i class="bi bi-search"></i> Buscar
-        </button>
-      </div>
-    </form>
-  </div>
-
-  <!-- Resultados / Vehículos -->
-  <div *ngIf="vehiculos?.length">
-    <h4 class="mb-3 text-secondary">Vehículos disponibles</h4>
-
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-      <div class="col" *ngFor="let v of vehiculos">
-        <div class="card h-100 shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title fw-bold">
-              {{ v.make }} {{ v.model }}
-            </h5>
-            <p class="card-text">
-              Tipo: {{ v.vehicle_type }}<br />
-              Precio: <strong>${{ v.price_per_day }}/día</strong><br />
-              Ciudad: {{ v.city }}
-            </p>
+        <form
+          class="row g-3 home-search-card bg-white shadow-sm rounded-4 p-3 p-md-4 mb-3"
+          (ngSubmit)="buscar()"
+          novalidate
+        >
+          <div class="col-md-6">
+            <label class="form-label fw-semibold" for="home-ciudad">Ciudad</label>
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="bi bi-geo-alt"></i>
+              </span>
+              <input
+                id="home-ciudad"
+                type="text"
+                class="form-control"
+                name="ciudad"
+                [(ngModel)]="filtros.ciudad"
+                placeholder="Ej: Medellín"
+              />
+            </div>
           </div>
-          <div class="card-footer text-end">
-            <a
-              [routerLink]="['/reservar', v.id]"
-              class="btn btn-sm btn-primary"
-            >
-              Reservar
+
+          <div class="col-md-6">
+            <label class="form-label fw-semibold" for="home-tipo">Tipo</label>
+            <input
+              id="home-tipo"
+              type="text"
+              class="form-control"
+              name="tipo"
+              [(ngModel)]="filtros.tipo"
+              placeholder="SUV, Sedan, Eléctrico..."
+            />
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label fw-semibold" for="home-fecha-inicio">
+              Fecha inicio
+            </label>
+            <input
+              id="home-fecha-inicio"
+              type="date"
+              class="form-control"
+              name="fecha_inicio"
+              [(ngModel)]="filtros.fecha_inicio"
+            />
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label fw-semibold" for="home-fecha-fin">
+              Fecha fin
+            </label>
+            <input
+              id="home-fecha-fin"
+              type="date"
+              class="form-control"
+              name="fecha_fin"
+              [(ngModel)]="filtros.fecha_fin"
+            />
+          </div>
+
+          <div class="col-12 d-grid d-md-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-lg px-4">
+              <i class="bi bi-search me-2"></i>
+              Buscar vehículos
+            </button>
+            <a class="btn btn-outline-secondary btn-lg px-4" routerLink="/buscar">
+              Ver todas las opciones
             </a>
+          </div>
+        </form>
+
+        <p class="text-muted small">
+          Los precios pueden variar según disponibilidad y temporada. Mantén tu sesión iniciada para confirmar tu reserva sin interrupciones.
+        </p>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="home-hero-visual rounded-4 shadow-sm p-4 p-md-5">
+          <div class="d-flex flex-column gap-4">
+            <div class="d-flex align-items-center gap-3">
+              <div class="icon-circle bg-danger-subtle text-danger">
+                <i class="bi bi-speedometer2"></i>
+              </div>
+              <div>
+                <h5 class="mb-1">Entrega y devolución flexible</h5>
+                <p class="text-muted mb-0">
+                  Coordina horarios y puntos de encuentro según tu agenda.
+                </p>
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+              <div class="icon-circle bg-primary-subtle text-primary">
+                <i class="bi bi-shield-check"></i>
+              </div>
+              <div>
+                <h5 class="mb-1">Pagos seguros</h5>
+                <p class="text-muted mb-0">
+                  Transacciones protegidas y soporte en tiempo real.
+                </p>
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+              <div class="icon-circle bg-success-subtle text-success">
+                <i class="bi bi-ev-front"></i>
+              </div>
+              <div>
+                <h5 class="mb-1">Flota moderna</h5>
+                <p class="text-muted mb-0">
+                  Vehículos asegurados, eléctricos y de combustión.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+</section>
+
+<section class="home-highlights py-5">
+  <div class="container">
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+      <div>
+        <h2 class="fw-semibold mb-1">Recomendados para ti</h2>
+        <p class="text-muted mb-0">
+          Una selección rápida de vehículos disponibles ahora mismo.
+        </p>
+      </div>
+      <div
+        class="text-muted small d-flex align-items-center gap-2"
+        *ngIf="isLoadingDestacados"
+      >
+        <span
+          class="spinner-border spinner-border-sm"
+          role="status"
+          aria-hidden="true"
+        ></span>
+        Consultando disponibilidad...
+      </div>
+    </div>
+
+    <div
+      class="alert alert-danger"
+      role="alert"
+      *ngIf="errorDestacados"
+    >
+      {{ errorDestacados }}
+    </div>
+
+    <div
+      class="row row-cols-1 row-cols-md-3 g-4"
+      *ngIf="destacados.length; else noHighlights"
+    >
+      <div class="col" *ngFor="let v of destacados">
+        <div class="card vehicle-card h-100 border-0 shadow-sm">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <span class="badge text-bg-light text-secondary">{{ v.city || v.location || 'Sin ciudad' }}</span>
+              <span class="text-primary fw-semibold">
+                ${{ v.price_per_day }}/día
+              </span>
+            </div>
+            <h5 class="card-title fw-semibold mb-1">
+              {{ v.make }} {{ v.model }}
+            </h5>
+            <p class="text-muted small mb-4">
+              {{ v.vehicle_type }} · {{ v.capacity || '?' }} pasajeros · {{ v.transmission || 'Transmisión' }}
+            </p>
+            <div class="mt-auto d-flex justify-content-between align-items-center">
+              <span class="text-muted small">
+                {{ v.fuel_type || 'Combustible' }}
+              </span>
+              <a
+                [routerLink]="['/reservar', v.id]"
+                class="btn btn-outline-primary btn-sm"
+              >
+                Reservar
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noHighlights>
+      <div class="text-muted text-center py-5">
+        <p class="mb-2">Aún no tenemos recomendaciones para mostrar.</p>
+        <a class="btn btn-outline-primary" routerLink="/buscar">
+          Ver todos los vehículos
+        </a>
+      </div>
+    </ng-template>
+  </div>
+</section>

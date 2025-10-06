@@ -1,61 +1,234 @@
-<div class="container py-4">
-  <div class="card shadow-sm">
-    <div class="card-body">
-      <h2 class="card-title mb-4 text-primary">Reservar Vehículo</h2>
-
-      <form (ngSubmit)="reservar()" #reservaForm="ngForm">
-        <div class="row g-3">
-          <div class="col-md-4">
-            <label class="form-label">Fecha inicio:</label>
-            <input
-              type="date"
-              class="form-control"
-              [(ngModel)]="reserva.start_date"
-              name="fecha_inicio"
-              required
-            />
+<div class="container py-4 reservar-page">
+  <div class="row justify-content-center">
+    <div class="col-xl-7 col-lg-8">
+      <div class="card border-0 shadow-lg">
+        <div class="card-body p-4 p-md-5">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-4">
+            <div>
+              <h2 class="text-primary fw-semibold mb-1">Reservar vehículo</h2>
+              <p class="text-muted mb-0">
+                Confirma la disponibilidad y completa tu reserva.
+              </p>
+            </div>
+            <a
+              routerLink="/buscar"
+              class="btn btn-outline-secondary btn-sm align-self-md-center"
+            >
+              ← Volver a la búsqueda
+            </a>
           </div>
 
-          <div class="col-md-4">
-            <label class="form-label">Fecha fin:</label>
-            <input
-              type="date"
-              class="form-control"
-              [(ngModel)]="reserva.end_date"
-              name="fecha_fin"
-              required
-            />
+          <div
+            class="alert alert-danger"
+            role="alert"
+            *ngIf="vehicleError"
+          >
+            {{ vehicleError }}
           </div>
 
-          <div class="col-md-4">
-            <label class="form-label">Últimos 4 dígitos tarjeta:</label>
-            <input
-              type="text"
-              maxlength="4"
-              class="form-control"
-              [(ngModel)]="reserva.card_last4"
-              name="ultimos4"
-              required
-            />
+          <div
+            class="d-flex align-items-center gap-2 text-muted mb-3"
+            *ngIf="isLoadingVehicle"
+          >
+            <span
+              class="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true"
+            ></span>
+            Cargando información del vehículo...
           </div>
 
-          <div class="col-12">
-            <label class="form-label">Comentarios:</label>
-            <textarea
-              class="form-control"
-              rows="3"
-              [(ngModel)]="reserva.comentarios"
-              name="comentarios"
-            ></textarea>
+          <div
+            *ngIf="vehicle"
+            class="vehicle-summary border rounded-4 p-3 p-md-4 mb-4"
+          >
+            <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+              <div>
+                <span class="badge text-bg-light text-secondary mb-2">
+                  {{ vehicle.city || vehicle.location || 'Sin ciudad' }}
+                </span>
+                <h4 class="fw-semibold mb-1">
+                  {{ vehicle.make }} {{ vehicle.model }}
+                </h4>
+                <p class="text-muted mb-0">
+                  {{ vehicle.vehicle_type }} · {{ vehicle.capacity || '?' }} pasajeros
+                </p>
+              </div>
+              <div class="text-end">
+                <span class="text-muted text-uppercase small d-block">Tarifa</span>
+                <span class="display-6 fw-bold text-primary">
+                  ${{ vehicle.price_per_day }}
+                </span>
+                <span class="text-muted small d-block">por día</span>
+              </div>
+            </div>
           </div>
 
-          <div class="col-12 text-end">
-            <button class="btn btn-primary" type="submit">
-              Reservar
-            </button>
-          </div>
+          <form
+            (ngSubmit)="reservar(reservaForm)"
+            #reservaForm="ngForm"
+            novalidate
+          >
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold" for="start_date">
+                  Fecha inicio
+                </label>
+                <input
+                  id="start_date"
+                  type="date"
+                  class="form-control"
+                  name="start_date"
+                  [(ngModel)]="reserva.start_date"
+                  #startDate="ngModel"
+                  required
+                  [min]="minStartDate"
+                  [class.is-invalid]="reservaForm.submitted && startDate.invalid"
+                />
+                <div
+                  class="invalid-feedback"
+                  *ngIf="reservaForm.submitted && startDate.errors?.['required']"
+                >
+                  Selecciona la fecha de inicio.
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label fw-semibold" for="end_date">
+                  Fecha fin
+                </label>
+                <input
+                  id="end_date"
+                  type="date"
+                  class="form-control"
+                  name="end_date"
+                  [(ngModel)]="reserva.end_date"
+                  #endDate="ngModel"
+                  required
+                  [min]="minEndDate"
+                  [class.is-invalid]="reservaForm.submitted && endDate.invalid"
+                />
+                <div
+                  class="invalid-feedback"
+                  *ngIf="reservaForm.submitted && endDate.errors?.['required']"
+                >
+                  Selecciona la fecha de entrega.
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label fw-semibold" for="metodo_pago">
+                  Método de pago
+                </label>
+                <select
+                  id="metodo_pago"
+                  class="form-select"
+                  name="metodo_pago"
+                  [(ngModel)]="reserva.metodo_pago"
+                  #metodoPago="ngModel"
+                  required
+                  [class.is-invalid]="reservaForm.submitted && metodoPago.invalid"
+                >
+                  <option value="tarjeta">Tarjeta crédito / débito</option>
+                  <option value="pse">PSE</option>
+                  <option value="efectivo">Efectivo</option>
+                </select>
+                <div
+                  class="invalid-feedback"
+                  *ngIf="reservaForm.submitted && metodoPago.errors?.['required']"
+                >
+                  Selecciona el método de pago.
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label fw-semibold" for="card_last4">
+                  Últimos 4 dígitos
+                </label>
+                <input
+                  id="card_last4"
+                  type="text"
+                  class="form-control"
+                  name="card_last4"
+                  [(ngModel)]="reserva.card_last4"
+                  #cardLast4="ngModel"
+                  required
+                  pattern="[0-9]{4}"
+                  maxlength="4"
+                  inputmode="numeric"
+                  [class.is-invalid]="reservaForm.submitted && cardLast4.invalid"
+                />
+                <div
+                  class="invalid-feedback"
+                  *ngIf="reservaForm.submitted && cardLast4.errors?.['required']"
+                >
+                  Este campo es obligatorio.
+                </div>
+                <div
+                  class="invalid-feedback"
+                  *ngIf="reservaForm.submitted && cardLast4.errors?.['pattern']"
+                >
+                  Debes ingresar exactamente 4 dígitos.
+                </div>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label fw-semibold" for="comentarios">
+                  Comentarios adicionales
+                </label>
+                <textarea
+                  id="comentarios"
+                  class="form-control"
+                  rows="3"
+                  name="comentarios"
+                  [(ngModel)]="reserva.comentarios"
+                ></textarea>
+              </div>
+            </div>
+
+            <div
+              class="alert mt-4"
+              [ngClass]="{
+                'alert-success': mensajeTipo === 'success',
+                'alert-danger': mensajeTipo === 'danger'
+              }"
+              role="alert"
+              *ngIf="mensaje"
+            >
+              {{ mensaje }}
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-4">
+              <button
+                type="button"
+                class="btn btn-link text-decoration-none text-muted"
+                routerLink="/home"
+              >
+                Volver al inicio
+              </button>
+
+              <button
+                type="submit"
+                class="btn btn-primary btn-lg"
+                [disabled]="cargando || isLoadingVehicle"
+              >
+                <span *ngIf="!cargando">Confirmar reserva</span>
+                <span
+                  *ngIf="cargando"
+                  class="d-flex align-items-center gap-2"
+                >
+                  <span
+                    class="spinner-border spinner-border-sm"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                  Procesando...
+                </span>
+              </button>
+            </div>
+          </form>
         </div>
-      </form>
+      </div>
     </div>
   </div>
 </div>

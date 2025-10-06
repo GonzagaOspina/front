@@ -1,0 +1,54 @@
+.home-hero {
+  background: linear-gradient(135deg, rgba(0, 48, 73, 0.05), rgba(247, 127, 0, 0.08));
+
+  .home-search-card .form-control {
+    border-radius: 0.8rem;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .home-search-card .form-control:focus {
+    border-color: rgba(214, 40, 40, 0.75);
+    box-shadow: 0 0 0 0.15rem rgba(214, 40, 40, 0.12);
+  }
+
+  .home-search-card .btn {
+    border-radius: 0.9rem;
+  }
+
+  .home-hero-visual {
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.8));
+    border: 1px solid rgba(255, 255, 255, 0.4);
+  }
+
+  .icon-circle {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 1.5rem;
+  }
+}
+
+.home-highlights {
+  .vehicle-card {
+    border-radius: 1.25rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .vehicle-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 1.8rem 3.4rem rgba(0, 0, 0, 0.1);
+  }
+
+  .vehicle-card .btn {
+    border-radius: 999px;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-hero .home-search-card {
+    border-radius: 1.25rem;
+  }
+}

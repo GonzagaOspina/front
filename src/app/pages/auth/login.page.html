@@ -1,18 +1,106 @@
-<div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-md-4">
-      <div class="card p-4 shadow-sm">
-        <h3 class="text-center mb-4">Iniciar sesión</h3>
-        <form (ngSubmit)="login()">
-          <div class="mb-3">
-            <input type="email" class="form-control" placeholder="Correo" [(ngModel)]="email" name="email" />
+<section class="auth-section d-flex align-items-center">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-5 col-md-7">
+        <div class="card border-0 shadow auth-card">
+          <div class="card-body p-4 p-md-5">
+            <h3 class="text-center fw-semibold mb-2">Bienvenido a AutoShare</h3>
+            <p class="text-center text-muted mb-4">
+              Ingresa tus credenciales para continuar.
+            </p>
+
+            <form
+              (ngSubmit)="login(loginForm)"
+              #loginForm="ngForm"
+              novalidate
+            >
+              <div class="mb-3">
+                <label class="form-label fw-semibold" for="email">Correo electrónico</label>
+                <input
+                  id="email"
+                  type="email"
+                  class="form-control form-control-lg"
+                  name="email"
+                  [(ngModel)]="email"
+                  #emailCtrl="ngModel"
+                  required
+                  email
+                  [class.is-invalid]="loginForm.submitted && emailCtrl.invalid"
+                />
+                <div
+                  class="invalid-feedback"
+                  *ngIf="loginForm.submitted && emailCtrl.errors?.['required']"
+                >
+                  El correo es obligatorio.
+                </div>
+                <div
+                  class="invalid-feedback"
+                  *ngIf="loginForm.submitted && emailCtrl.errors?.['email']"
+                >
+                  Ingresa un correo válido.
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label fw-semibold" for="password">Contraseña</label>
+                <input
+                  id="password"
+                  type="password"
+                  class="form-control form-control-lg"
+                  name="password"
+                  [(ngModel)]="password"
+                  #passwordCtrl="ngModel"
+                  required
+                  minlength="6"
+                  [class.is-invalid]="loginForm.submitted && passwordCtrl.invalid"
+                />
+                <div
+                  class="invalid-feedback"
+                  *ngIf="loginForm.submitted && passwordCtrl.errors?.['required']"
+                >
+                  La contraseña es obligatoria.
+                </div>
+                <div
+                  class="invalid-feedback"
+                  *ngIf="loginForm.submitted && passwordCtrl.errors?.['minlength']"
+                >
+                  Debe tener al menos 6 caracteres.
+                </div>
+              </div>
+
+              <div
+                class="alert alert-danger py-2"
+                *ngIf="error"
+                role="alert"
+              >
+                {{ error }}
+              </div>
+
+              <button
+                class="btn btn-primary w-100 btn-lg"
+                type="submit"
+                [disabled]="isLoading || loginForm.invalid"
+              >
+                <span *ngIf="!isLoading">Ingresar</span>
+                <span
+                  *ngIf="isLoading"
+                  class="d-flex align-items-center justify-content-center gap-2"
+                >
+                  <span
+                    class="spinner-border spinner-border-sm"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                  Validando...
+                </span>
+              </button>
+            </form>
           </div>
-          <div class="mb-3">
-            <input type="password" class="form-control" placeholder="Contraseña" [(ngModel)]="password" name="password" />
-          </div>
-          <button class="btn btn-primary w-100">Entrar</button>
-        </form>
+        </div>
+        <p class="text-center text-muted mt-3 small">
+          ¿Necesitas una cuenta? Contacta al administrador del sistema.
+        </p>
       </div>
     </div>
   </div>
-</div>
+</section>

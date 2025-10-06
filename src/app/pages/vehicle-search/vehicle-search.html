@@ -1,38 +1,171 @@
-<div class="container py-4">
-  <h2 class="mb-4">Buscar vehículos</h2>
+<div class="container py-4 vehicle-search-page">
+  <div
+    class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-2 mb-4"
+  >
+    <div>
+      <h2 class="fw-bold mb-1">Buscar vehículos</h2>
+      <p class="text-muted mb-0">
+        Filtra por ciudad, tipo y fechas para ver disponibilidad en tiempo real.
+      </p>
+    </div>
+    <div
+      class="text-muted small d-flex align-items-center gap-2"
+      *ngIf="isLoading"
+    >
+      <span
+        class="spinner-border spinner-border-sm"
+        role="status"
+        aria-hidden="true"
+      ></span>
+      Actualizando resultados...
+    </div>
+  </div>
 
-  <form class="row g-2 mb-4" (ngSubmit)="buscar()">
-    <div class="col-md-3">
-      <input class="form-control" type="text" placeholder="Ciudad" [(ngModel)]="filters.ciudad" name="ciudad" />
+  <form
+    class="row g-3 mb-4 filter-card bg-white shadow-sm rounded-4 px-3 px-md-4 py-3"
+    (ngSubmit)="buscar()"
+    novalidate
+  >
+    <div class="col-lg-3 col-md-6">
+      <label class="form-label fw-semibold" for="ciudad">Ciudad</label>
+      <div class="input-group">
+        <span class="input-group-text">
+          <i class="bi bi-geo-alt"></i>
+        </span>
+        <input
+          id="ciudad"
+          class="form-control"
+          type="text"
+          placeholder="Ej: Bogotá"
+          [(ngModel)]="filters.ciudad"
+          name="ciudad"
+        />
+      </div>
     </div>
-    <div class="col-md-3">
-      <input class="form-control" type="text" placeholder="Tipo" [(ngModel)]="filters.tipo" name="tipo" />
+
+    <div class="col-lg-3 col-md-6">
+      <label class="form-label fw-semibold" for="tipo">Tipo</label>
+      <input
+        id="tipo"
+        class="form-control"
+        type="text"
+        placeholder="SUV, Sedán..."
+        [(ngModel)]="filters.tipo"
+        name="tipo"
+      />
     </div>
-    <div class="col-md-2">
-      <input class="form-control" type="date" [(ngModel)]="filters.fecha_inicio" name="fecha_inicio" />
+
+    <div class="col-lg-2 col-md-6">
+      <label class="form-label fw-semibold" for="fecha_inicio">Fecha inicio</label>
+      <input
+        id="fecha_inicio"
+        class="form-control"
+        type="date"
+        [(ngModel)]="filters.fecha_inicio"
+        name="fecha_inicio"
+      />
     </div>
-    <div class="col-md-2">
-      <input class="form-control" type="date" [(ngModel)]="filters.fecha_fin" name="fecha_fin" />
+
+    <div class="col-lg-2 col-md-6">
+      <label class="form-label fw-semibold" for="fecha_fin">Fecha fin</label>
+      <input
+        id="fecha_fin"
+        class="form-control"
+        type="date"
+        [(ngModel)]="filters.fecha_fin"
+        name="fecha_fin"
+      />
     </div>
-    <div class="col-md-2">
-      <button type="submit" class="btn btn-primary w-100">Buscar</button>
+
+    <div class="col-lg-2 col-md-12 d-grid align-items-end">
+      <button
+        type="submit"
+        class="btn btn-danger btn-lg"
+        [disabled]="isLoading"
+      >
+        <i class="bi bi-search me-1"></i>
+        Buscar
+      </button>
     </div>
   </form>
 
-  <div class="row">
-    <div class="col-md-5">
-      <div *ngFor="let v of vehicles" class="card mb-3 shadow-sm">
+  <div
+    class="alert alert-danger mb-4"
+    role="alert"
+    *ngIf="errorMessage"
+  >
+    {{ errorMessage }}
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-5 order-2 order-lg-1">
+      <div
+        class="alert alert-info"
+        role="alert"
+        *ngIf="!vehicles.length && !isLoading && hasFilters"
+      >
+        No encontramos vehículos con los filtros seleccionados.
+        Ajusta los criterios e inténtalo nuevamente.
+      </div>
+
+      <div
+        class="text-muted text-center py-4"
+        *ngIf="!vehicles.length && !isLoading && !hasFilters"
+      >
+        Ingresa una ciudad o rango de fechas para comenzar tu búsqueda.
+      </div>
+
+      <div *ngFor="let v of vehicles" class="card result-card shadow-sm mb-3">
         <div class="card-body">
-          <h5 class="card-title">{{ v.make }} {{ v.model }}</h5>
-          <p class="card-text">{{ v.vehicle_type }} · {{ v.capacity }} pasajeros</p>
-          <p class="card-text text-success fw-bold">${{ v.price_per_day }}/día</p>
-          <a [routerLink]="['/reservar', v.id]" class="btn btn-outline-primary btn-sm">Reservar</a>
+          <div
+            class="d-flex justify-content-between align-items-start gap-3 mb-2"
+          >
+            <div>
+              <h5 class="card-title mb-1">
+                {{ v.make }} {{ v.model }}
+              </h5>
+              <p class="text-muted small mb-0">
+                {{ v.vehicle_type }} · {{ v.capacity || '?' }} pasajeros
+              </p>
+            </div>
+            <span
+              class="badge text-bg-light text-secondary fw-semibold"
+            >
+              {{ v.city || v.location || 'Sin ciudad' }}
+            </span>
+          </div>
+
+          <p class="h5 text-primary fw-bold mb-3">
+            ${{ v.price_per_day }}/día
+          </p>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="text-muted small">
+              {{ v.transmission || 'Transmisión' }} ·
+              {{ v.fuel_type || 'Combustible' }}
+            </div>
+            <a
+              [routerLink]="['/reservar', v.id]"
+              class="btn btn-outline-primary btn-sm"
+            >
+              Reservar
+            </a>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="col-md-7">
-      <div id="map" class="rounded shadow" style="height: 500px;"></div>
+    <div class="col-lg-7 order-1 order-lg-2">
+      <div class="map-wrapper rounded-4 shadow-sm position-relative">
+        <div id="map"></div>
+        <div
+          class="map-placeholder text-muted text-center"
+          *ngIf="!vehicles.length && !isLoading"
+        >
+          <i class="bi bi-map fs-2 d-block mb-2"></i>
+          El mapa se actualizará cuando haya resultados.
+        </div>
+      </div>
     </div>
   </div>
 </div>

@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { FormsModule, NgForm } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 
@@ -11,20 +11,48 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./login.page.scss'],
   imports: [FormsModule, CommonModule]
 })
-export class LoginPage {
+export class LoginPage implements OnInit {
   email = '';
   password = '';
   error = '';
+  isLoading = false;
+  returnUrl = '/buscar';
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(
+    private auth: AuthService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
 
-  login() {
+  ngOnInit(): void {
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+    if (returnUrl) {
+      this.returnUrl = returnUrl;
+    }
+  }
+
+  login(form: NgForm) {
+    if (form.invalid) {
+      form.control.markAllAsTouched();
+      return;
+    }
+
+    this.error = '';
+    this.isLoading = true;
+
     this.auth.login(this.email, this.password).subscribe({
       next: () => {
-        this.router.navigate(['/buscar']); // redirige a la búsqueda
+        this.isLoading = false;
+        const target = this.returnUrl?.startsWith('/') ? this.returnUrl : '/buscar';
+        this.router.navigateByUrl(target);
       },
-      error: () => {
-        this.error = 'Credenciales incorrectas';
+      error: (err) => {
+        this.isLoading = false;
+        const serverMessage =
+          err?.error?.message ||
+          err?.error?.detail ||
+          err?.error?.error_description;
+        this.error = serverMessage || 'Credenciales incorrectas';
       }
     });
   }
