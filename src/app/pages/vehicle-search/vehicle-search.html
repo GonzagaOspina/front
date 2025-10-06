@@ -1,26 +1,38 @@
-<h2>Buscar vehículos</h2>
+<div class="container py-4">
+  <h2 class="mb-4">Buscar vehículos</h2>
 
-<form (ngSubmit)="buscar()" class="formulario">
-  <input type="text" placeholder="Ciudad" [(ngModel)]="filters.ciudad" name="ciudad" />
-  <input type="text" placeholder="Tipo" [(ngModel)]="filters.tipo" name="tipo" />
-  <input type="date" [(ngModel)]="filters.fecha_inicio" name="fecha_inicio" />
-  <input type="date" [(ngModel)]="filters.fecha_fin" name="fecha_fin" />
-  <button type="submit">Buscar</button>
-</form>
+  <form class="row g-2 mb-4" (ngSubmit)="buscar()">
+    <div class="col-md-3">
+      <input class="form-control" type="text" placeholder="Ciudad" [(ngModel)]="filters.ciudad" name="ciudad" />
+    </div>
+    <div class="col-md-3">
+      <input class="form-control" type="text" placeholder="Tipo" [(ngModel)]="filters.tipo" name="tipo" />
+    </div>
+    <div class="col-md-2">
+      <input class="form-control" type="date" [(ngModel)]="filters.fecha_inicio" name="fecha_inicio" />
+    </div>
+    <div class="col-md-2">
+      <input class="form-control" type="date" [(ngModel)]="filters.fecha_fin" name="fecha_fin" />
+    </div>
+    <div class="col-md-2">
+      <button type="submit" class="btn btn-primary w-100">Buscar</button>
+    </div>
+  </form>
 
-<div class="contenedor">
-  <!-- Lista de vehículos -->
-  <div class="lista">
-    <ul>
-     <div *ngFor="let v of vehicles" class="card">
-  <h3>{{ v.make }} {{ v.model }}</h3>
-  <p><strong>Tipo:</strong> {{ v.vehicle_type }}</p>
-  <p><strong>Precio:</strong> ${{ v.price_per_day }}/día</p>
-  <p><strong>Ubicación:</strong> {{ v.location }}</p>
-</div>
-    </ul>
+  <div class="row">
+    <div class="col-md-5">
+      <div *ngFor="let v of vehicles" class="card mb-3 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{ v.make }} {{ v.model }}</h5>
+          <p class="card-text">{{ v.vehicle_type }} · {{ v.capacity }} pasajeros</p>
+          <p class="card-text text-success fw-bold">${{ v.price_per_day }}/día</p>
+          <a [routerLink]="['/reservar', v.id]" class="btn btn-outline-primary btn-sm">Reservar</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-7">
+      <div id="map" class="rounded shadow" style="height: 500px;"></div>
+    </div>
   </div>
-
-  <!-- Mapa -->
-  <div id="map"></div>
 </div>

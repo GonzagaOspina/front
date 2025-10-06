@@ -1,19 +1,61 @@
-<h2>Reservar Vehículo</h2>
+<div class="container py-4">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h2 class="card-title mb-4 text-primary">Reservar Vehículo</h2>
 
-<form (ngSubmit)="reservar()">
-  <label>Fecha inicio:</label>
-  <input type="date" [(ngModel)]="reserva.start_date" name="start_date" required />
+      <form (ngSubmit)="reservar()" #reservaForm="ngForm">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Fecha inicio:</label>
+            <input
+              type="date"
+              class="form-control"
+              [(ngModel)]="reserva.start_date"
+              name="fecha_inicio"
+              required
+            />
+          </div>
 
-  <label>Fecha fin:</label>
-  <input type="date" [(ngModel)]="reserva.end_date" name="end_date" required />
+          <div class="col-md-4">
+            <label class="form-label">Fecha fin:</label>
+            <input
+              type="date"
+              class="form-control"
+              [(ngModel)]="reserva.end_date"
+              name="fecha_fin"
+              required
+            />
+          </div>
 
-  <label>Últimos 4 dígitos tarjeta:</label>
-  <input type="text" maxlength="4" [(ngModel)]="reserva.card_last4" name="card_last4" required />
+          <div class="col-md-4">
+            <label class="form-label">Últimos 4 dígitos tarjeta:</label>
+            <input
+              type="text"
+              maxlength="4"
+              class="form-control"
+              [(ngModel)]="reserva.card_last4"
+              name="ultimos4"
+              required
+            />
+          </div>
 
-  <label>Comentarios:</label>
-  <textarea [(ngModel)]="reserva.comentarios" name="comentarios"></textarea>
+          <div class="col-12">
+            <label class="form-label">Comentarios:</label>
+            <textarea
+              class="form-control"
+              rows="3"
+              [(ngModel)]="reserva.comentarios"
+              name="comentarios"
+            ></textarea>
+          </div>
 
-  <button type="submit" [disabled]="cargando">Reservar</button>
-</form>
-
-<p *ngIf="mensaje">{{ mensaje }}</p>
+          <div class="col-12 text-end">
+            <button class="btn btn-primary" type="submit">
+              Reservar
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

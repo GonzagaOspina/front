@@ -1,1 +1,39 @@
-/* You can add global styles to this file, and also import other style files */
+$primary-color: #003049;
+$secondary-color: #d62828;
+$accent-color: #f77f00;
+$light-color: #fefae0;
+$dark-color: #343a40;
+$text-color: #212529;
+
+$font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+body {
+  background-color: #fffaf0; // fondo suave
+  font-family: 'Segoe UI', sans-serif;
+}
+
+
+h1, h2, h3 {
+  color: $primary-color;
+}
+
+a {
+  color: $secondary-color;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+button {
+  background-color: $primary-color;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $secondary-color;
+  }
+}

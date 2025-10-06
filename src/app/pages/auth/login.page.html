@@ -1,9 +1,18 @@
-<h2>Iniciar sesión</h2>
-
-<form (ngSubmit)="login()">
-  <input type="email" [(ngModel)]="email" name="email" placeholder="Correo" required />
-  <input type="password" [(ngModel)]="password" name="password" placeholder="Contraseña" required />
-  <button type="submit">Ingresar</button>
-</form>
-
-<p *ngIf="error" style="color: red;">{{ error }}</p>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-4">
+      <div class="card p-4 shadow-sm">
+        <h3 class="text-center mb-4">Iniciar sesión</h3>
+        <form (ngSubmit)="login()">
+          <div class="mb-3">
+            <input type="email" class="form-control" placeholder="Correo" [(ngModel)]="email" name="email" />
+          </div>
+          <div class="mb-3">
+            <input type="password" class="form-control" placeholder="Contraseña" [(ngModel)]="password" name="password" />
+          </div>
+          <button class="btn btn-primary w-100">Entrar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,4 +1,72 @@
-<h1>Bienvenido a AutoShare 🚗</h1>
-<p>Explora y alquila vehículos fácilmente.</p>
+<div class="container py-5">
+  <!-- Caja blanca tipo KAYAK -->
+  <div class="bg-white rounded-4 shadow-sm p-4 mb-5">
+    <h3 class="fw-bold mb-3 text-dark">
+      Renta de autos en <span class="text-primary">Colombia</span> 🚗
+    </h3>
 
-<a routerLink="/buscar">Ir a Buscar Vehículos</a>
+    <!-- Filtros de búsqueda -->
+    <form class="row g-3 align-items-end" (ngSubmit)="buscar()">
+      <div class="col-md-4">
+        <label class="form-label">Ciudad</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="filtros.ciudad"
+            name="ciudad"
+            placeholder="Ej: Bogotá"
+          />
+        </div>
+      </div>
+
+
+      <div class="col-md-3">
+        <label class="form-label">Fecha inicio</label>
+        <input
+          type="date"
+          class="form-control"
+          [(ngModel)]="filtros.fechaInicio"
+          name="fechaInicio"
+        />
+      </div>
+
+      <div class="col-md-2 d-grid">
+        <button type="submit" class="btn btn-danger">
+          <i class="bi bi-search"></i> Buscar
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Resultados / Vehículos -->
+  <div *ngIf="vehiculos?.length">
+    <h4 class="mb-3 text-secondary">Vehículos disponibles</h4>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+      <div class="col" *ngFor="let v of vehiculos">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title fw-bold">
+              {{ v.make }} {{ v.model }}
+            </h5>
+            <p class="card-text">
+              Tipo: {{ v.vehicle_type }}<br />
+              Precio: <strong>${{ v.price_per_day }}/día</strong><br />
+              Ciudad: {{ v.city }}
+            </p>
+          </div>
+          <div class="card-footer text-end">
+            <a
+              [routerLink]="['/reservar', v.id]"
+              class="btn btn-sm btn-primary"
+            >
+              Reservar
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

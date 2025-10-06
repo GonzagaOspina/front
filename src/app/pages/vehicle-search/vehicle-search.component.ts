@@ -1,13 +1,14 @@
 import { Component, AfterViewInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { CommonModule, NgFor } from '@angular/common';
 import * as maplibregl from 'maplibre-gl';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-vehicle-search',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, NgFor, HttpClientModule, RouterModule],
   templateUrl: './vehicle-search.html',
   styleUrls: ['./vehicle-search.scss'],
 })
