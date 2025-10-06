@@ -29,10 +29,9 @@ export class ReservarPage {
     private router: Router,
     private reservasService: ReservasService
   ) {}
-
-  ngOnInit() {
-    this.vehicleId = this.route.snapshot.paramMap.get('vehicleId') || '';
-  }
+ngOnInit() {
+  this.vehicleId = this.route.snapshot.paramMap.get('id') || ''; // ✅ FIX
+}
 
   reservar() {
     const token = localStorage.getItem('access_token');
@@ -40,11 +39,11 @@ export class ReservarPage {
       this.mensaje = 'Usuario no autenticado';
       return;
     }
-
     const payload = {
       vehicle_id: this.vehicleId,
       ...this.reserva
     };
+    console.log('Payload enviado:', payload);
 
     this.cargando = true;
     this.reservasService.crearReserva(payload, token).subscribe({
