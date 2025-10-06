@@ -1,0 +1,250 @@
+<section class="auth-section d-flex align-items-center">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-6 col-md-8">
+        <div class="card border-0 shadow auth-card">
+          <div class="card-body p-4 p-md-5">
+            <h3 class="text-center fw-semibold mb-2">Crear cuenta</h3>
+            <p class="text-center text-muted mb-4">
+              Registra tus datos para empezar a reservar vehículos.
+            </p>
+
+            <form
+              (ngSubmit)="register(registerForm)"
+              #registerForm="ngForm"
+              novalidate
+            >
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label fw-semibold" for="nombre">
+                    Nombre completo
+                  </label>
+                  <input
+                    id="nombre"
+                    type="text"
+                    class="form-control form-control-lg"
+                    name="nombre"
+                    [(ngModel)]="nombre"
+                    #nombreCtrl="ngModel"
+                    required
+                    minlength="3"
+                    [class.is-invalid]="registerForm.submitted && nombreCtrl.invalid"
+                  />
+                  <div
+                    class="invalid-feedback"
+                    *ngIf="registerForm.submitted && nombreCtrl.errors?.['required']"
+                  >
+                    El nombre es obligatorio.
+                  </div>
+                  <div
+                    class="invalid-feedback"
+                    *ngIf="registerForm.submitted && nombreCtrl.errors?.['minlength']"
+                  >
+                    Debe tener al menos 3 caracteres.
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label fw-semibold" for="email">
+                    Correo electrónico
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    class="form-control form-control-lg"
+                    name="email"
+                    [(ngModel)]="email"
+                    #emailCtrl="ngModel"
+                    required
+                    email
+                    [class.is-invalid]="registerForm.submitted && emailCtrl.invalid"
+                  />
+                  <div
+                    class="invalid-feedback"
+                    *ngIf="registerForm.submitted && emailCtrl.errors?.['required']"
+                  >
+                    El correo es obligatorio.
+                  </div>
+                  <div
+                    class="invalid-feedback"
+                    *ngIf="registerForm.submitted && emailCtrl.errors?.['email']"
+                  >
+                    Ingresa un correo válido.
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold" for="password">
+                    Contraseña
+                  </label>
+                  <input
+                    id="password"
+                    type="password"
+                    class="form-control form-control-lg"
+                    name="password"
+                    [(ngModel)]="password"
+                    #passwordCtrl="ngModel"
+                    required
+                    minlength="6"
+                    [class.is-invalid]="registerForm.submitted && passwordCtrl.invalid"
+                  />
+                  <div
+                    class="invalid-feedback"
+                    *ngIf="registerForm.submitted && passwordCtrl.errors?.['required']"
+                  >
+                    La contraseña es obligatoria.
+                  </div>
+                  <div
+                    class="invalid-feedback"
+                    *ngIf="registerForm.submitted && passwordCtrl.errors?.['minlength']"
+                  >
+                    Debe tener al menos 6 caracteres.
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold" for="confirmPassword">
+                    Confirmar contraseña
+                  </label>
+                  <input
+                    id="confirmPassword"
+                    type="password"
+                    class="form-control form-control-lg"
+                    name="confirmPassword"
+                    [(ngModel)]="confirmPassword"
+                    #confirmPasswordCtrl="ngModel"
+                    required
+                    [class.is-invalid]="registerForm.submitted && confirmPasswordCtrl.invalid"
+                  />
+                  <div
+                    class="invalid-feedback"
+                    *ngIf="registerForm.submitted && confirmPasswordCtrl.errors?.['required']"
+                  >
+                    Confirma tu contraseña.
+                  </div>
+                  <div
+                    class="invalid-feedback"
+                    *ngIf="registerForm.submitted && password !== confirmPassword"
+                  >
+                    Las contraseñas no coinciden.
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label fw-semibold" for="telefono">
+                    Teléfono (opcional)
+                  </label>
+                  <input
+                    id="telefono"
+                    type="tel"
+                    class="form-control form-control-lg"
+                    name="telefono"
+                    [(ngModel)]="telefono"
+                    pattern="^[0-9+()\s-]{8,}$"
+                    #telefonoCtrl="ngModel"
+                    [class.is-invalid]="registerForm.submitted && telefonoCtrl.invalid"
+                  />
+                  <div
+                    class="invalid-feedback"
+                    *ngIf="registerForm.submitted && telefonoCtrl.errors?.['pattern']"
+                  >
+                    Ingresa un teléfono válido.
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label fw-semibold d-block mb-2">
+                    ¿Qué rol necesitas?
+                    <span class="text-muted small d-block">
+                      Elige cómo usarás la plataforma. Los administradores solo se crean internamente.
+                    </span>
+                  </label>
+
+                  <div class="role-options">
+                    <label
+                      class="role-option"
+                      *ngFor="let option of roles"
+                    >
+                      <input
+                        type="radio"
+                        name="rol"
+                        class="form-check-input"
+                        [value]="option.value"
+                        [(ngModel)]="rol"
+                        required
+                      />
+                      <div class="role-content">
+                        <span class="role-title">{{ option.label }}</span>
+                        <span class="role-description text-muted small">
+                          {{ option.description }}
+                        </span>
+                      </div>
+                    </label>
+                  </div>
+                  <div
+                    class="text-danger small mt-2"
+                    *ngIf="registerForm.submitted && !rol"
+                  >
+                    Selecciona un rol para continuar.
+                  </div>
+                </div>
+
+                <div class="col-12 role-help text-muted small">
+                  <p class="mb-1">
+                    <strong>Cliente:</strong> busca vehículos, genera reservas y realiza los pagos asociados.
+                  </p>
+                  <p class="mb-1">
+                    <strong>Anfitrión:</strong> publica y administra vehículos; puede revisar reservas sobre su flota.
+                  </p>
+                  <p class="mb-0">
+                    <strong>Administrador:</strong> uso interno para soporte y cobros. Si necesitas este acceso, contacta a un administrador.
+                  </p>
+                </div>
+              </div>
+
+              <div
+                class="alert alert-danger mt-4 py-2"
+                *ngIf="error"
+                role="alert"
+              >
+                {{ error }}
+              </div>
+
+              <div
+                class="alert alert-success mt-4 py-2"
+                *ngIf="success"
+                role="alert"
+              >
+                {{ success }}
+              </div>
+
+              <button
+                class="btn btn-primary w-100 btn-lg mt-4"
+                type="submit"
+                [disabled]="isLoading"
+              >
+                <span *ngIf="!isLoading">Registrarme</span>
+                <span
+                  *ngIf="isLoading"
+                  class="d-flex align-items-center justify-content-center gap-2"
+                >
+                  <span
+                    class="spinner-border spinner-border-sm"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                  Guardando...
+                </span>
+              </button>
+            </form>
+
+            <p class="text-center text-muted mt-4 mb-0 small">
+              ¿Ya tienes cuenta?
+              <a routerLink="/login" class="fw-semibold">Inicia sesión aquí</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

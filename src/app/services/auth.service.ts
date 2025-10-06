@@ -21,4 +21,20 @@ export class AuthService {
   isLoggedIn(): boolean {
     return !!localStorage.getItem('access_token');
   }
+
+  register(payload: {
+    nombre: string;
+    email: string;
+    password: string;
+    rol: string;
+    telefono?: string;
+  }): Observable<any> {
+    return this.http.post('/api/auth/register', payload).pipe(
+      tap((res: any) => {
+        if (res?.access_token) {
+          localStorage.setItem('access_token', res.access_token);
+        }
+      })
+    );
+  }
 }

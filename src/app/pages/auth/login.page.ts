@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 
@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-login-page',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
-  imports: [FormsModule, CommonModule]
+  imports: [FormsModule, CommonModule, RouterModule]
 })
 export class LoginPage implements OnInit {
   email = '';
