@@ -1,0 +1,26 @@
+<h2>Buscar vehículos</h2>
+
+<form (ngSubmit)="buscar()" class="formulario">
+  <input type="text" placeholder="Ciudad" [(ngModel)]="filters.ciudad" name="ciudad" />
+  <input type="text" placeholder="Tipo" [(ngModel)]="filters.tipo" name="tipo" />
+  <input type="date" [(ngModel)]="filters.fecha_inicio" name="fecha_inicio" />
+  <input type="date" [(ngModel)]="filters.fecha_fin" name="fecha_fin" />
+  <button type="submit">Buscar</button>
+</form>
+
+<div class="contenedor">
+  <!-- Lista de vehículos -->
+  <div class="lista">
+    <ul>
+     <div *ngFor="let v of vehicles" class="card">
+  <h3>{{ v.make }} {{ v.model }}</h3>
+  <p><strong>Tipo:</strong> {{ v.vehicle_type }}</p>
+  <p><strong>Precio:</strong> ${{ v.price_per_day }}/día</p>
+  <p><strong>Ubicación:</strong> {{ v.location }}</p>
+</div>
+    </ul>
+  </div>
+
+  <!-- Mapa -->
+  <div id="map"></div>
+</div>
