@@ -6,7 +6,7 @@
           <div class="card-body p-4 p-md-5">
             <h3 class="text-center fw-semibold mb-2">Crear cuenta</h3>
             <p class="text-center text-muted mb-4">
-              Registra tus datos para empezar a reservar vehículos.
+              Registra tus datos para empezar a reservar vehiculos.
             </p>
 
             <form
@@ -46,7 +46,7 @@
 
                 <div class="col-12">
                   <label class="form-label fw-semibold" for="email">
-                    Correo electrónico
+                    Correo electronico
                   </label>
                   <input
                     id="email"
@@ -63,19 +63,19 @@
                     class="invalid-feedback"
                     *ngIf="registerForm.submitted && emailCtrl.errors?.['required']"
                   >
-                    El correo es obligatorio.
+                    Ingresa un correo.
                   </div>
                   <div
                     class="invalid-feedback"
                     *ngIf="registerForm.submitted && emailCtrl.errors?.['email']"
                   >
-                    Ingresa un correo válido.
+                    Ingresa un correo valido.
                   </div>
                 </div>
 
                 <div class="col-md-6">
                   <label class="form-label fw-semibold" for="password">
-                    Contraseña
+                    Contrasena
                   </label>
                   <input
                     id="password"
@@ -85,26 +85,26 @@
                     [(ngModel)]="password"
                     #passwordCtrl="ngModel"
                     required
-                    minlength="6"
+                    minlength="8"
                     [class.is-invalid]="registerForm.submitted && passwordCtrl.invalid"
                   />
                   <div
                     class="invalid-feedback"
                     *ngIf="registerForm.submitted && passwordCtrl.errors?.['required']"
                   >
-                    La contraseña es obligatoria.
+                    La contrasena es obligatoria.
                   </div>
                   <div
                     class="invalid-feedback"
                     *ngIf="registerForm.submitted && passwordCtrl.errors?.['minlength']"
                   >
-                    Debe tener al menos 6 caracteres.
+                    Debe tener al menos 8 caracteres.
                   </div>
                 </div>
 
                 <div class="col-md-6">
                   <label class="form-label fw-semibold" for="confirmPassword">
-                    Confirmar contraseña
+                    Confirmar contrasena
                   </label>
                   <input
                     id="confirmPassword"
@@ -114,25 +114,32 @@
                     [(ngModel)]="confirmPassword"
                     #confirmPasswordCtrl="ngModel"
                     required
-                    [class.is-invalid]="registerForm.submitted && confirmPasswordCtrl.invalid"
+                    [class.is-invalid]="
+                      registerForm.submitted &&
+                      (confirmPasswordCtrl.invalid || password !== confirmPassword)
+                    "
                   />
                   <div
                     class="invalid-feedback"
                     *ngIf="registerForm.submitted && confirmPasswordCtrl.errors?.['required']"
                   >
-                    Confirma tu contraseña.
+                    Confirma tu contrasena.
                   </div>
                   <div
                     class="invalid-feedback"
-                    *ngIf="registerForm.submitted && password !== confirmPassword"
+                    *ngIf="
+                      registerForm.submitted &&
+                      !confirmPasswordCtrl.errors?.['required'] &&
+                      password !== confirmPassword
+                    "
                   >
-                    Las contraseñas no coinciden.
+                    Las contrasenas no coinciden.
                   </div>
                 </div>
 
-                <div class="col-12">
+                <div class="col-md-6">
                   <label class="form-label fw-semibold" for="telefono">
-                    Teléfono (opcional)
+                    Telefono (opcional)
                   </label>
                   <input
                     id="telefono"
@@ -140,90 +147,73 @@
                     class="form-control form-control-lg"
                     name="telefono"
                     [(ngModel)]="telefono"
-                    pattern="^[0-9+()\s-]{8,}$"
                     #telefonoCtrl="ngModel"
+                    pattern="^[0-9+()\\s-]{7,20}$"
                     [class.is-invalid]="registerForm.submitted && telefonoCtrl.invalid"
+                    placeholder="+57 300 000 0000"
                   />
                   <div
                     class="invalid-feedback"
                     *ngIf="registerForm.submitted && telefonoCtrl.errors?.['pattern']"
                   >
-                    Ingresa un teléfono válido.
+                    Ingresa un telefono valido.
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold" for="rol">
+                    Que rol necesitas?
+                  </label>
+                  <select
+                    id="rol"
+                    class="form-select form-select-lg"
+                    name="rol"
+                    [(ngModel)]="rol"
+                    required
+                  >
+                    <option *ngFor="let option of roles" [value]="option.value">
+                      {{ option.label }}
+                    </option>
+                  </select>
+                  <div class="form-text">
+                    Elige como usaras la plataforma. Los administradores solo se crean internamente.
                   </div>
                 </div>
 
                 <div class="col-12">
-                  <label class="form-label fw-semibold d-block mb-2">
-                    ¿Qué rol necesitas?
-                    <span class="text-muted small d-block">
-                      Elige cómo usarás la plataforma. Los administradores solo se crean internamente.
-                    </span>
-                  </label>
-
-                  <div class="role-options">
-                    <label
-                      class="role-option"
-                      *ngFor="let option of roles"
-                    >
-                      <input
-                        type="radio"
-                        name="rol"
-                        class="form-check-input"
-                        [value]="option.value"
-                        [(ngModel)]="rol"
-                        required
-                      />
-                      <div class="role-content">
-                        <span class="role-title">{{ option.label }}</span>
-                        <span class="role-description text-muted small">
-                          {{ option.description }}
-                        </span>
+                  <div class="bg-light rounded-3 p-3">
+                    <h6 class="fw-semibold mb-2">Roles disponibles</h6>
+                    <div class="row g-3">
+                      <div class="col-md-6" *ngFor="let option of roles">
+                        <div class="border rounded-3 p-3 h-100">
+                          <h6 class="fw-semibold mb-1">{{ option.label }}</h6>
+                          <p class="text-muted small mb-0">
+                            {{ option.description }}
+                          </p>
+                        </div>
                       </div>
-                    </label>
+                    </div>
                   </div>
-                  <div
-                    class="text-danger small mt-2"
-                    *ngIf="registerForm.submitted && !rol"
-                  >
-                    Selecciona un rol para continuar.
-                  </div>
-                </div>
-
-                <div class="col-12 role-help text-muted small">
-                  <p class="mb-1">
-                    <strong>Cliente:</strong> busca vehículos, genera reservas y realiza los pagos asociados.
-                  </p>
-                  <p class="mb-1">
-                    <strong>Anfitrión:</strong> publica y administra vehículos; puede revisar reservas sobre su flota.
-                  </p>
-                  <p class="mb-0">
-                    <strong>Administrador:</strong> uso interno para soporte y cobros. Si necesitas este acceso, contacta a un administrador.
-                  </p>
                 </div>
               </div>
 
               <div
-                class="alert alert-danger mt-4 py-2"
-                *ngIf="error"
-                role="alert"
+                class="alert mt-4"
+                [ngClass]="{
+                  'alert-success': success,
+                  'alert-danger': error
+                }"
+                *ngIf="success || error"
               >
-                {{ error }}
-              </div>
-
-              <div
-                class="alert alert-success mt-4 py-2"
-                *ngIf="success"
-                role="alert"
-              >
-                {{ success }}
+                {{ success || error }}
               </div>
 
               <button
-                class="btn btn-primary w-100 btn-lg mt-4"
+                class="btn btn-primary w-100 btn-lg mt-3"
                 type="submit"
                 [disabled]="isLoading"
               >
-                <span *ngIf="!isLoading">Registrarme</span>
+                <span *ngIf="!isLoading">Crear cuenta</span>
                 <span
                   *ngIf="isLoading"
                   class="d-flex align-items-center justify-content-center gap-2"
@@ -233,17 +223,16 @@
                     role="status"
                     aria-hidden="true"
                   ></span>
-                  Guardando...
+                  Procesando...
                 </span>
               </button>
             </form>
-
-            <p class="text-center text-muted mt-4 mb-0 small">
-              ¿Ya tienes cuenta?
-              <a routerLink="/login" class="fw-semibold">Inicia sesión aquí</a>
-            </p>
           </div>
         </div>
+        <p class="text-center text-muted mt-3 small">
+          Ya tienes cuenta?
+          <a routerLink="/login" class="fw-semibold">Inicia sesion aqui</a>
+        </p>
       </div>
     </div>
   </div>

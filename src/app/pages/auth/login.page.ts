@@ -16,7 +16,7 @@ export class LoginPage implements OnInit {
   password = '';
   error = '';
   isLoading = false;
-  returnUrl = '/buscar';
+  returnUrl = '/home';
 
   constructor(
     private auth: AuthService,
@@ -43,7 +43,7 @@ export class LoginPage implements OnInit {
     this.auth.login(this.email, this.password).subscribe({
       next: () => {
         this.isLoading = false;
-        const target = this.returnUrl?.startsWith('/') ? this.returnUrl : '/buscar';
+        const target = this.returnUrl?.startsWith('/') ? this.returnUrl : '/home';
         this.router.navigateByUrl(target);
       },
       error: (err) => {

@@ -15,7 +15,7 @@
               novalidate
             >
               <div class="mb-3">
-                <label class="form-label fw-semibold" for="email">Correo electrónico</label>
+                <label class="form-label fw-semibold" for="email">Correo electronico</label>
                 <input
                   id="email"
                   type="email"
@@ -37,12 +37,12 @@
                   class="invalid-feedback"
                   *ngIf="loginForm.submitted && emailCtrl.errors?.['email']"
                 >
-                  Ingresa un correo válido.
+                  Ingresa un correo valido.
                 </div>
               </div>
 
               <div class="mb-4">
-                <label class="form-label fw-semibold" for="password">Contraseña</label>
+                <label class="form-label fw-semibold" for="password">Contrasena</label>
                 <input
                   id="password"
                   type="password"
@@ -58,7 +58,7 @@
                   class="invalid-feedback"
                   *ngIf="loginForm.submitted && passwordCtrl.errors?.['required']"
                 >
-                  La contraseña es obligatoria.
+                  La contrasena es obligatoria.
                 </div>
                 <div
                   class="invalid-feedback"
@@ -98,8 +98,8 @@
           </div>
         </div>
         <p class="text-center text-muted mt-3 small">
-          ¿Aún no tienes cuenta?
-          <a routerLink="/register" class="fw-semibold">Regístrate aquí</a>
+          Aun no tienes cuenta?
+          <a routerLink="/register" class="fw-semibold">Registrate aqui</a>
         </p>
       </div>
     </div>

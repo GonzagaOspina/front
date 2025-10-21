@@ -1,11 +1,12 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+<nav class="navbar navbar-expand-lg shadow-sm">
   <div class="container">
     <a
       class="navbar-brand d-flex align-items-center gap-2"
       [routerLink]="isLoggedIn ? '/home' : '/login'"
     >
+      <span class="brand-mark"></span>
       <span class="fs-5 fw-semibold">AutoShare</span>
-      <span aria-hidden="true">🚗</span>
+      <span class="brand-pill" aria-hidden="true">beta</span>
     </a>
 
     <button
@@ -62,7 +63,7 @@
         <li class="nav-item" *ngIf="isLoggedIn">
           <button
             type="button"
-            class="btn btn-outline-light btn-sm ms-lg-3"
+            class="btn btn-outline-primary btn-sm ms-lg-3"
             (click)="logout()"
           >
             Salir

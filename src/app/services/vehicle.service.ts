@@ -1,6 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class VehicleService {
@@ -15,6 +16,31 @@ export class VehicleService {
 
   getVehicleById(id: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/${id}`);
+  }
+
+  getVehicleAvailability(id: string, includePast = false): Observable<{ vehicle_id: string; reservations: any[] }> {
+    let params = new HttpParams();
+    if (includePast) {
+      params = params.set('include_past', 'true');
+    }
+
+    return this.http.get<{ vehicle_id: string; reservations: any[] }>(`${this.baseUrl}/${id}/availability`, {
+      params,
+    });
+  }
+
+  getVehicleCities(): Observable<string[]> {
+    return this.http.get<{ items?: unknown }>(`${this.baseUrl}/cities`).pipe(
+      map((response) => {
+        const items = (response?.items ?? []) as unknown;
+        if (!Array.isArray(items)) {
+          return [];
+        }
+        return items
+          .filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
+          .map((item) => item.trim());
+      }),
+    );
   }
 
   private buildParams(filters?: Record<string, unknown>): HttpParams {

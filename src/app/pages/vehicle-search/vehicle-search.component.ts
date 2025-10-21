@@ -11,19 +11,20 @@ import * as maplibregl from 'maplibre-gl';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { VehicleService } from '../../services/vehicle.service';
+import { VehicleCardComponent } from '../../components/vehicle-card/vehicle-card.component';
 
 type Coordinates = { lat: number; lng: number };
 type VehicleFilters = {
   ciudad: string;
   tipo: string;
-  fecha_inicio: string;
-  fecha_fin: string;
+  precio_min: string;
+  precio_max: string;
 };
 
 @Component({
   selector: 'app-vehicle-search',
   standalone: true,
-  imports: [FormsModule, CommonModule, NgFor, RouterModule],
+  imports: [FormsModule, CommonModule, NgFor, RouterModule, VehicleCardComponent],
   templateUrl: './vehicle-search.html',
   styleUrls: ['./vehicle-search.scss'],
 })
@@ -33,18 +34,20 @@ export class VehicleSearchComponent
   filters: VehicleFilters = {
     ciudad: '',
     tipo: '',
-    fecha_inicio: '',
-    fecha_fin: '',
+    precio_min: '',
+    precio_max: '',
   };
 
   vehicles: any[] = [];
   isLoading = false;
   errorMessage = '';
+  cities: string[] = [];
 
   map?: maplibregl.Map;
   markers: maplibregl.Marker[] = [];
 
   private readonly destroy$ = new Subject<void>();
+  private suppressCityAutoSearch = false;
   private readonly defaultCenter: Coordinates = { lng: -74.0721, lat: 4.711 };
   private readonly cityCoords: Record<string, Coordinates> = {
     bogota: { lat: 4.711, lng: -74.0721 },
@@ -56,8 +59,8 @@ export class VehicleSearchComponent
   private readonly filterKeys: Array<keyof VehicleFilters> = [
     'ciudad',
     'tipo',
-    'fecha_inicio',
-    'fecha_fin',
+    'precio_min',
+    'precio_max',
   ];
 
   constructor(
@@ -66,6 +69,18 @@ export class VehicleSearchComponent
   ) {}
 
   ngOnInit(): void {
+    this.vehicleService
+      .getVehicleCities()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (cities) => {
+          this.cities = cities;
+        },
+        error: () => {
+          this.cities = [];
+        },
+      });
+
     this.route.queryParamMap
       .pipe(takeUntil(this.destroy$))
       .subscribe((params) => {
@@ -76,11 +91,12 @@ export class VehicleSearchComponent
           nextFilters[key] = value ?? '';
         });
 
+        this.suppressCityAutoSearch = true;
         this.filters = nextFilters;
-
-        if (this.hasActiveFilters()) {
-          this.buscar();
-        }
+        this.buscar();
+        setTimeout(() => {
+          this.suppressCityAutoSearch = false;
+        });
       });
   }
 
@@ -100,7 +116,21 @@ export class VehicleSearchComponent
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.vehicleService.getVehicles(this.filters).subscribe({
+    const filtros = { ...this.filters };
+    const min = filtros.precio_min.trim();
+    const max = filtros.precio_max.trim();
+
+    if (min && max) {
+      const minValue = Number.parseFloat(min);
+      const maxValue = Number.parseFloat(max);
+      if (!Number.isNaN(minValue) && !Number.isNaN(maxValue) && minValue > maxValue) {
+        this.isLoading = false;
+        this.errorMessage = 'El precio minimo no puede ser mayor al precio maximo.';
+        return;
+      }
+    }
+
+    this.vehicleService.getVehicles(filtros).subscribe({
       next: (response) => {
         this.vehicles = this.resolveVehiclesResponse(response);
         this.isLoading = false;
@@ -119,15 +149,36 @@ export class VehicleSearchComponent
         this.errorMessage =
           err?.error?.message ||
           err?.error?.detail ||
-          'No pudimos cargar los vehículos. Intenta nuevamente.';
+          'No pudimos cargar los vehiculos. Intenta nuevamente.';
       },
+    });
+  }
+
+  onCityChange(): void {
+    if (this.suppressCityAutoSearch) {
+      return;
+    }
+    this.buscar();
+  }
+
+  resetFilters(): void {
+    this.suppressCityAutoSearch = true;
+    this.filters = {
+      ciudad: '',
+      tipo: '',
+      precio_min: '',
+      precio_max: '',
+    };
+    this.buscar();
+    setTimeout(() => {
+      this.suppressCityAutoSearch = false;
     });
   }
 
   private initMap(): void {
     this.map = new maplibregl.Map({
       container: 'map',
-      style: 'https://tiles.stadiamaps.com/styles/osm_bright.json',
+      style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
       center: [this.defaultCenter.lng, this.defaultCenter.lat],
       zoom: 12,
     });
@@ -136,7 +187,7 @@ export class VehicleSearchComponent
     this.map.addControl(
       new maplibregl.AttributionControl({
         compact: true,
-        customAttribution: '© MapLibre, OpenMapTiles, OpenStreetMap',
+        customAttribution: 'MapLibre, OpenMapTiles, OpenStreetMap',
       }),
       'bottom-right'
     );
@@ -164,15 +215,17 @@ export class VehicleSearchComponent
     this.vehicles.forEach((vehicle) => {
       const coords = this.getVehicleCoordinates(vehicle, cityCoords);
       const popupHtml = `
-        <strong>${vehicle.make ?? ''} ${vehicle.model ?? ''}</strong><br>
-        ${vehicle.vehicle_type ?? ''} · $${vehicle.price_per_day ?? '--'}/día<br>
-        ${vehicle.city ?? vehicle.location ?? ''}
+        <div class="popup-card">
+          <strong>${vehicle.make ?? ''} ${vehicle.model ?? ''}</strong><br>
+          <span>${vehicle.vehicle_type ?? ''} - $${vehicle.price_per_day ?? '--'}/dia</span><br>
+          <small>${vehicle.city ?? vehicle.location ?? ''}</small>
+        </div>
       `;
 
       const marker = new maplibregl.Marker({ color: '#d62828' })
         .setLngLat([coords.lng, coords.lat])
         .setPopup(
-          new maplibregl.Popup({ closeButton: false }).setHTML(popupHtml)
+          new maplibregl.Popup({ closeButton: false, className: 'vehicle-popup' }).setHTML(popupHtml)
         );
 
       marker.addTo(map);
@@ -185,12 +238,8 @@ export class VehicleSearchComponent
     this.markers = [];
   }
 
-  get hasFilters(): boolean {
-    return this.hasActiveFilters();
-  }
-
-  private hasActiveFilters(): boolean {
-    return this.filterKeys.some((key) => this.filters[key].trim() !== '');
+  get selectedCityLabel(): string {
+    return this.filters.ciudad?.trim() || 'Todas las ciudades';
   }
 
   private resolveVehiclesResponse(response: any): any[] {

@@ -28,13 +28,13 @@ export class RegisterPage {
       value: 'cliente',
       label: 'Cliente',
       description:
-        'Reserva vehículos, gestiona sus propias reservas y realiza pagos.',
+        'Reserva vehiculos, gestiona sus propias reservas y realiza pagos.',
     },
     {
       value: 'anfitrion',
-      label: 'Anfitrión',
+      label: 'Anfitrion',
       description:
-        'Publica vehículos y administra su disponibilidad. No crea reservas.',
+        'Publica vehiculos y administra su disponibilidad. No crea reservas.',
     },
   ];
 
@@ -47,7 +47,7 @@ export class RegisterPage {
     }
 
     if (this.password !== this.confirmPassword) {
-      this.error = 'Las contraseñas no coinciden.';
+      this.error = 'Las contrasenas no coinciden.';
       return;
     }
 

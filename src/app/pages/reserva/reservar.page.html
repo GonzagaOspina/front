@@ -1,11 +1,11 @@
-<div class="container py-4 reservar-page">
+﻿<div class="container py-4 reservar-page">
   <div class="row justify-content-center">
     <div class="col-xl-7 col-lg-8">
       <div class="card border-0 shadow-lg">
         <div class="card-body p-4 p-md-5">
           <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-4">
             <div>
-              <h2 class="text-primary fw-semibold mb-1">Reservar vehículo</h2>
+              <h2 class="text-primary fw-semibold mb-1">Reservar vehiculo</h2>
               <p class="text-muted mb-0">
                 Confirma la disponibilidad y completa tu reserva.
               </p>
@@ -14,7 +14,7 @@
               routerLink="/buscar"
               class="btn btn-outline-secondary btn-sm align-self-md-center"
             >
-              ← Volver a la búsqueda
+              &larr; Volver a la busqueda
             </a>
           </div>
 
@@ -35,7 +35,7 @@
               role="status"
               aria-hidden="true"
             ></span>
-            Cargando información del vehículo...
+            Cargando informacion del vehiculo...
           </div>
 
           <div
@@ -50,17 +50,71 @@
                 <h4 class="fw-semibold mb-1">
                   {{ vehicle.make }} {{ vehicle.model }}
                 </h4>
-                <p class="text-muted mb-0">
-                  {{ vehicle.vehicle_type }} · {{ vehicle.capacity || '?' }} pasajeros
+                <p class="text-muted mb-2">
+                  {{ vehicle.vehicle_type }} - {{ vehicle.capacity || '?' }} pasajeros
                 </p>
+                <div class="pickup-location-pill">
+                  <i class="bi bi-geo-alt-fill me-1"></i>
+                  {{ pickupLocationLabel }}
+                </div>
               </div>
               <div class="text-end">
                 <span class="text-muted text-uppercase small d-block">Tarifa</span>
                 <span class="display-6 fw-bold text-primary">
                   ${{ vehicle.price_per_day }}
                 </span>
-                <span class="text-muted small d-block">por día</span>
+                <span class="text-muted small d-block">por dia</span>
               </div>
+            </div>
+          </div>
+
+          <div
+            *ngIf="vehicle"
+            class="pickup-section mb-4"
+          >
+            <div class="pickup-card">
+              <header class="pickup-card__header">
+                <span class="pickup-card__badge">Punto de encuentro</span>
+                <h5 class="mb-2">Entrega y recogida</h5>
+              </header>
+              <p class="pickup-card__text">
+                Recoge el vehiculo en <strong>{{ pickupLocationLabel }}</strong>. Una vez confirmes la reserva,
+                coordinaremos contigo los horarios exactos.
+              </p>
+              <div id="pickup-map" class="pickup-map"></div>
+            </div>
+            <div class="availability-card">
+              <header class="availability-card__header">
+                <span class="availability-card__badge">Calendario</span>
+                <h5 class="mb-2">Reservas existentes</h5>
+              </header>
+              <div class="availability-card__loading" *ngIf="isLoadingAvailability">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Consultando fechas reservadas...
+              </div>
+              <div class="alert alert-danger" *ngIf="availabilityError">
+                {{ availabilityError }}
+              </div>
+              <ul
+                class="availability-list"
+                *ngIf="!isLoadingAvailability && !availabilityError && availabilityRanges.length"
+              >
+                <li *ngFor="let rango of availabilityRanges">
+                  <span>
+                    {{ rango.start_date | date : 'mediumDate' }} - {{ rango.end_date | date : 'mediumDate' }}
+                  </span>
+                  <span class="badge rounded-pill text-bg-dark">Reservado</span>
+                </li>
+              </ul>
+              <p
+                class="availability-card__empty"
+                *ngIf="!isLoadingAvailability && !availabilityError && !availabilityRanges.length"
+              >
+                Agenda abierta sin bloqueos. Elige el periodo que prefieras.
+              </p>
+              <small class="text-muted d-block mt-2">
+                Las fechas marcadas se bloquean automaticamente para evitar cruces.
+              </small>
             </div>
           </div>
 
@@ -81,15 +135,26 @@
                   name="start_date"
                   [(ngModel)]="reserva.start_date"
                   #startDate="ngModel"
+                  (ngModelChange)="onStartDateChange($event, startDate, endDate)"
                   required
                   [min]="minStartDate"
-                  [class.is-invalid]="reservaForm.submitted && startDate.invalid"
+                  [class.is-invalid]="
+                    (reservaForm.submitted && startDate.invalid) ||
+                    startDate.errors?.['conflict'] ||
+                    startDate.errors?.['range']
+                  "
                 />
                 <div
                   class="invalid-feedback"
                   *ngIf="reservaForm.submitted && startDate.errors?.['required']"
                 >
                   Selecciona la fecha de inicio.
+                </div>
+                <div
+                  class="invalid-feedback"
+                  *ngIf="startDate.errors?.['conflict']"
+                >
+                  Fecha no disponible. Elige otro dia.
                 </div>
               </div>
 
@@ -104,9 +169,14 @@
                   name="end_date"
                   [(ngModel)]="reserva.end_date"
                   #endDate="ngModel"
+                  (ngModelChange)="onEndDateChange($event, startDate, endDate)"
                   required
                   [min]="minEndDate"
-                  [class.is-invalid]="reservaForm.submitted && endDate.invalid"
+                  [class.is-invalid]="
+                    (reservaForm.submitted && endDate.invalid) ||
+                    endDate.errors?.['conflict'] ||
+                    endDate.errors?.['range']
+                  "
                 />
                 <div
                   class="invalid-feedback"
@@ -114,36 +184,46 @@
                 >
                   Selecciona la fecha de entrega.
                 </div>
+                <div
+                  class="invalid-feedback"
+                  *ngIf="endDate.errors?.['conflict']"
+                >
+                  El rango incluye dias ocupados. Ajusta tu seleccion.
+                </div>
               </div>
 
               <div class="col-md-6">
                 <label class="form-label fw-semibold" for="metodo_pago">
-                  Método de pago
+                  Metodo de pago
                 </label>
                 <select
                   id="metodo_pago"
                   class="form-select"
                   name="metodo_pago"
                   [(ngModel)]="reserva.metodo_pago"
+                  (ngModelChange)="onMetodoPagoChange($event)"
                   #metodoPago="ngModel"
                   required
                   [class.is-invalid]="reservaForm.submitted && metodoPago.invalid"
                 >
-                  <option value="tarjeta">Tarjeta crédito / débito</option>
-                  <option value="pse">PSE</option>
-                  <option value="efectivo">Efectivo</option>
+                  <option value="" disabled>Selecciona una opcion</option>
+                  <option value="tarjeta">Tarjeta credito / debito</option>
+                  <option value="transferencia">Transferencia bancaria</option>
                 </select>
                 <div
                   class="invalid-feedback"
                   *ngIf="reservaForm.submitted && metodoPago.errors?.['required']"
                 >
-                  Selecciona el método de pago.
+                  Selecciona el metodo de pago.
+                </div>
+                <div class="form-text">
+                  Todos los pagos se realizan de forma electronica. No se aceptan pagos en efectivo.
                 </div>
               </div>
 
-              <div class="col-md-6">
+              <div class="col-md-6" *ngIf="reserva.metodo_pago === 'tarjeta'">
                 <label class="form-label fw-semibold" for="card_last4">
-                  Últimos 4 dígitos
+                  Ultimos 4 digitos
                 </label>
                 <input
                   id="card_last4"
@@ -153,37 +233,52 @@
                   [(ngModel)]="reserva.card_last4"
                   #cardLast4="ngModel"
                   required
-                  pattern="[0-9]{4}"
+                  pattern="^[0-9]{4}$"
                   maxlength="4"
-                  inputmode="numeric"
                   [class.is-invalid]="reservaForm.submitted && cardLast4.invalid"
                 />
                 <div
                   class="invalid-feedback"
                   *ngIf="reservaForm.submitted && cardLast4.errors?.['required']"
                 >
-                  Este campo es obligatorio.
+                  Debes ingresar los cuatro ultimos digitos de la tarjeta.
                 </div>
                 <div
                   class="invalid-feedback"
                   *ngIf="reservaForm.submitted && cardLast4.errors?.['pattern']"
                 >
-                  Debes ingresar exactamente 4 dígitos.
+                  Debes ingresar exactamente 4 digitos.
                 </div>
               </div>
 
               <div class="col-12">
                 <label class="form-label fw-semibold" for="comentarios">
-                  Comentarios adicionales
+                  Comentarios (opcional)
                 </label>
                 <textarea
                   id="comentarios"
                   class="form-control"
-                  rows="3"
                   name="comentarios"
+                  rows="3"
+                  maxlength="280"
                   [(ngModel)]="reserva.comentarios"
+                  placeholder="Agrega detalles sobre la entrega o requerimientos especiales."
                 ></textarea>
+                <div class="form-text">
+                  Maximo 280 caracteres.
+                </div>
               </div>
+          </div>
+
+            <div
+              class="alert mt-3 availability-alert"
+              [ngClass]="{
+                'alert-info': availabilityMessageType === 'info',
+                'alert-danger': availabilityMessageType === 'danger'
+              }"
+              *ngIf="availabilityMessage"
+            >
+              {{ availabilityMessage }}
             </div>
 
             <div
@@ -192,38 +287,25 @@
                 'alert-success': mensajeTipo === 'success',
                 'alert-danger': mensajeTipo === 'danger'
               }"
-              role="alert"
               *ngIf="mensaje"
             >
               {{ mensaje }}
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-4">
-              <button
-                type="button"
-                class="btn btn-link text-decoration-none text-muted"
-                routerLink="/home"
-              >
-                Volver al inicio
-              </button>
-
+            <div class="d-grid mt-4">
               <button
                 type="submit"
                 class="btn btn-primary btn-lg"
-                [disabled]="cargando || isLoadingVehicle"
+                [disabled]="cargando"
               >
-                <span *ngIf="!cargando">Confirmar reserva</span>
                 <span
+                  class="spinner-border spinner-border-sm me-2"
+                  role="status"
+                  aria-hidden="true"
                   *ngIf="cargando"
-                  class="d-flex align-items-center gap-2"
-                >
-                  <span
-                    class="spinner-border spinner-border-sm"
-                    role="status"
-                    aria-hidden="true"
-                  ></span>
-                  Procesando...
-                </span>
+                ></span>
+                <span *ngIf="!cargando">Confirmar reserva</span>
+                <span *ngIf="cargando">Procesando...</span>
               </button>
             </div>
           </form>
@@ -232,3 +314,4 @@
     </div>
   </div>
 </div>
+
