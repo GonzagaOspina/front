@@ -16,6 +16,10 @@ export class App {
     return this.authService.isLoggedIn();
   }
 
+  get isAdmin(): boolean {
+    return this.authService.isAdmin();
+  }
+
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);

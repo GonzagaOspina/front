@@ -6,6 +6,7 @@ import { map } from 'rxjs/operators';
 @Injectable({ providedIn: 'root' })
 export class VehicleService {
   private readonly baseUrl = '/api/vehicles';
+  private readonly adminUrl = '/api/admin/vehicles';
 
   constructor(private http: HttpClient) {}
 
@@ -41,6 +42,23 @@ export class VehicleService {
           .map((item) => item.trim());
       }),
     );
+  }
+
+  createVehicle(payload: FormData): Observable<any> {
+    return this.http.post(this.baseUrl, payload);
+  }
+
+  listAdminVehicles(filters?: Record<string, unknown>): Observable<any> {
+    const params = this.buildParams(filters);
+    return this.http.get(this.adminUrl, { params });
+  }
+
+  getAdminVehicle(id: string): Observable<any> {
+    return this.http.get(`${this.adminUrl}/${id}`);
+  }
+
+  updateVehicleStatus(id: string, status: string): Observable<any> {
+    return this.http.patch(`${this.baseUrl}/${id}/status`, { status });
   }
 
   private buildParams(filters?: Record<string, unknown>): HttpParams {

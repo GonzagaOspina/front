@@ -50,6 +50,9 @@
                 <h4 class="fw-semibold mb-1">
                   {{ vehicle.make }} {{ vehicle.model }}
                 </h4>
+                <p class="text-uppercase text-muted small mb-1" *ngIf="vehicle.license_plate">
+                  Placa: {{ vehicle.license_plate }}
+                </p>
                 <p class="text-muted mb-2">
                   {{ vehicle.vehicle_type }} - {{ vehicle.capacity || '?' }} pasajeros
                 </p>
@@ -63,8 +66,17 @@
                 <span class="display-6 fw-bold text-primary">
                   ${{ vehicle.price_per_day }}
                 </span>
-                <span class="text-muted small d-block">por dia</span>
+                <span class="text-muted small d-block">
+                  por dia · {{ (vehicle.currency ?? 'USD') | uppercase }}
+                </span>
               </div>
+            </div>
+            <div class="vehicle-summary__images mt-3" *ngIf="vehicleImages.length">
+              <img
+                *ngFor="let image of vehicleImages; let i = index"
+                [src]="image"
+                [alt]="'Imagen ' + (i + 1)"
+              />
             </div>
           </div>
 

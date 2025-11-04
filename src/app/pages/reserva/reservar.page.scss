@@ -12,6 +12,20 @@
     border: 1px solid rgba(67, 97, 238, 0.12);
   }
 
+  .vehicle-summary__images {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+
+    img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 0.85rem;
+      box-shadow: var(--shadow-soft);
+    }
+  }
+
   .pickup-location-pill {
     display: inline-flex;
     align-items: center;

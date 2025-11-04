@@ -110,6 +110,10 @@ export class ReservarPage implements OnInit, AfterViewInit, OnDestroy {
     return 'Ubicacion por confirmar';
   }
 
+  get vehicleImages(): string[] {
+    return this.extractImages(this.vehicle);
+  }
+
   reservar(form: NgForm): void {
     if (form.invalid) {
       form.control.markAllAsTouched();
@@ -554,6 +558,38 @@ export class ReservarPage implements OnInit, AfterViewInit, OnDestroy {
 
     const hasErrors = Object.keys(current).length > 0 ? current : null;
     model.control.setErrors(hasErrors);
+  }
+
+  private extractImages(source: any): string[] {
+    if (!source) {
+      return [];
+    }
+
+    const raw = source?.images ?? source?.image_urls ?? source?.photos;
+    const result: string[] = [];
+
+    if (Array.isArray(raw)) {
+      raw.forEach((item) => {
+        if (typeof item === 'string') {
+          const trimmed = item.trim();
+          if (trimmed) {
+            result.push(trimmed);
+          }
+          return;
+        }
+        if (item && typeof item === 'object') {
+          const record = item as Record<string, unknown>;
+          const candidate = record['url'] ?? record['path'] ?? record['src'];
+          if (typeof candidate === 'string' && candidate.trim()) {
+            result.push(candidate.trim());
+          }
+        }
+      });
+    } else if (typeof raw === 'string' && raw.trim()) {
+      result.push(raw.trim());
+    }
+
+    return result.slice(0, 4);
   }
 
   private normalizeVehicleResponse(response: any): any {

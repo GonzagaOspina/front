@@ -71,6 +71,21 @@ export class AuthService {
     }
   }
 
+  hasRole(role: string | string[]): boolean {
+    const profile = this.getProfile();
+    const currentRole = profile?.rol?.toLowerCase();
+    if (!currentRole) {
+      return false;
+    }
+
+    const roles = Array.isArray(role) ? role : [role];
+    return roles.some((target) => target.toLowerCase() === currentRole);
+  }
+
+  isAdmin(): boolean {
+    return this.hasRole('administrador');
+  }
+
   private storeSession(data: AuthResponse): void {
     if (data?.access_token) {
       localStorage.setItem(this.tokenKey, data.access_token);
